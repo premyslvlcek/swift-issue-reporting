@@ -247,6 +247,15 @@ func _currentTestID() -> AnyHashable? {
   return (function as! @Sendable () -> AnyHashable?)()
 }
 
+@usableFromInline
+func _currentTestNameComponents() -> [String]? {
+  #if DEBUG
+    return Test.current?.id.nameComponents
+  #else
+    return nil
+  #endif
+}
+
 #if DEBUG
   #if _runtime(_ObjC)
     import ObjectiveC
@@ -401,16 +410,16 @@ func _currentTestID() -> AnyHashable? {
 
       return result
     }
-    fileprivate struct ID: Hashable {
-      var moduleName: String
-      var nameComponents: [String]
-      var sourceLocation: SourceLocation?
-      init(moduleName: String, nameComponents: [String], sourceLocation: SourceLocation?) {
+    public struct ID: Hashable {
+      fileprivate var moduleName: String
+      public var nameComponents: [String]
+      fileprivate var sourceLocation: SourceLocation?
+      fileprivate init(moduleName: String, nameComponents: [String], sourceLocation: SourceLocation?) {
         self.moduleName = moduleName
         self.nameComponents = nameComponents
         self.sourceLocation = sourceLocation
       }
-      init(_ fullyQualifiedNameComponents: some Collection<String>) {
+      fileprivate init(_ fullyQualifiedNameComponents: some Collection<String>) {
         moduleName = fullyQualifiedNameComponents.first ?? ""
         if fullyQualifiedNameComponents.count > 0 {
           nameComponents = Array(fullyQualifiedNameComponents.dropFirst())
@@ -418,7 +427,7 @@ func _currentTestID() -> AnyHashable? {
           nameComponents = []
         }
       }
-      init(typeInfo: TypeInfo) {
+      fileprivate init(typeInfo: TypeInfo) {
         self.init(typeInfo.fullyQualifiedNameComponents)
       }
     }

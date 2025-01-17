@@ -29,6 +29,18 @@ public enum TestContext: Equatable, Sendable {
       return .xcTest
     }
   }
+  
+  public var currentTestNameComponents: [String]? {
+    guard isTesting else { return nil }
+    
+    switch self {
+    case .swiftTesting:
+      return _currentTestNameComponents()
+      
+    case .xcTest:
+      return nil
+    }
+  }
 
   /// Determines if the test context is Swift's native Testing framework.
   public var isSwiftTesting: Bool {
